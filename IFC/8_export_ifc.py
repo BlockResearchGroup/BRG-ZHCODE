@@ -1,8 +1,5 @@
-from compas_viewer import Viewer
-from compas_viewer.components import Treeform
 from compas_occ.brep import Brep
 from compas.datastructures import Mesh
-# from compas.colors import Color
 from compas.tolerance import TOL
 from compas.geometry import Transformation
 from compas.geometry import Frame
@@ -11,7 +8,7 @@ from compas_ifc.model import Model
 
 
 
-def add_elements(model: Model, name, parent, cls=None):
+def add_elements(model: Model, name, parent, get_cls=None):
 
     index = json.load(open(f"IFC/data/{name}.json"))
 
@@ -26,11 +23,11 @@ def add_elements(model: Model, name, parent, cls=None):
             brep = Brep.from_step(f"IFC/data/exports/{guid}.step")
             brep.scale(0.001) # OCC auto converts to mm, we want m
             if brep.is_solid:
-                obj = model.create(cls=cls, geometry=brep, name=info["name"], parent=parent)
+                obj = model.create(cls=get_cls(info), geometry=brep, name=info["name"], parent=parent)
     
         if info["type"] == "Mesh":
             mesh = Mesh.from_obj(f"IFC/data/exports/{guid}.obj")
-            model.create(cls=cls, geometry=mesh, name=info["name"], parent=parent)
+            model.create(cls=get_cls(info), geometry=mesh, name=info["name"], parent=parent)
 
         if info["type"] == "InstanceReferenceGeometry":
             block_id = info["block_id"]
@@ -45,7 +42,7 @@ def add_elements(model: Model, name, parent, cls=None):
                 brep = loaded_blocks[block_id]
 
             frame = Frame.from_matrix(info["transform"]) # We apply the rotation and translation components of the transformation to the frame
-            obj = model.create(cls=cls, geometry=brep, name=info["name"], parent=parent, frame=frame)
+            obj = model.create(cls=get_cls(info), geometry=brep, name=info["name"], parent=parent, frame=frame)
         
         if obj:
             obj.attributes["info"] = info
@@ -55,13 +52,50 @@ model = Model.template(unit="m", use_occ=False)
 
 TOL.lineardeflection = 1000
 
-slab = model.create_slab(name="Bridge", parent=model.building_storeys[0])
+slab = model.create(cls="IfcSlab", name="Bridge", parent=model.building_storeys[0])
+scaffold = model.create(cls="IfcElementAssembly", name="Scaffold", parent=model.building_storeys[0])
+support = model.create(cls="IfcElementAssembly", name="Support", parent=model.building_storeys[0])
 
-add_elements(model, "blocks", slab, "IfcBuildingElementPart")
-# add_elements(model, "supports")
-# add_elements(model, "waffle")
-# add_elements(model, "foundations")
 
-# model.print_spatial_hierarchy()
+mapping = {
+
+        # Blocks
+        "Blocks": "IfcBuildingElementPart",
+
+        # Waffle
+        "waffle_addition": "IfcMember",
+        "waffle_modules": "IfcMember",
+
+        # Supports
+        "tension_ties": "IfcPlate",
+        "splice_plates": "IfcPlate",
+        "Plates": "IfcPlate",
+        "bolts": "IfcMechanicalFastener",
+        "anchor_bolts": "IfcMechanicalFastener",
+
+         # Foundations
+        "concrete_pad": "IfcFooting",
+        "grout": "IfcBuildingElementPart",
+        "_UPDATE_concrete_pads": "IfcElementAssembly",
+    }
+
+def get_cls(info):
+
+    layer = info["layer"]
+    for layer_name, cls in mapping.items():
+        if layer.endswith(layer_name):
+            return cls
+
+    return "IfcBuildingElementProxy"
+
+
+add_elements(model, "blocks", slab, get_cls=get_cls)
+add_elements(model, "supports", support, get_cls=get_cls)
+add_elements(model, "waffle", scaffold, get_cls=get_cls)
+add_elements(model, "foundations", model.building_storeys[0], get_cls=get_cls)
+
+
 model.save("IFC/data/striatus.ifc")
+
+# model = Model("IFC/data/striatus.ifc")
 # model.show()
