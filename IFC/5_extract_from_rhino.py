@@ -1,6 +1,6 @@
 import rhinoscriptsyntax as rs
-import os
 import scriptcontext as sc
+import os
 import json
 
 
