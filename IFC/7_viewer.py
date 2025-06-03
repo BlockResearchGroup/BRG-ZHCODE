@@ -43,7 +43,7 @@ def create_hierarchy(scene, layer, file_group = None):
 
 def add_file(scene, name):
 
-    index = json.load(open(f"temp/ZHA/{name}.json"))
+    index = json.load(open(f"IFC/data/{name}.json"))
 
     file_group = scene.add_group(name=name)
     loaded_blocks = {}
@@ -54,14 +54,14 @@ def add_file(scene, name):
         obj = None
 
         if info["type"] == "Brep":
-            brep = Brep.from_step(f"temp/ZHA/step_exports/{guid}.step")
+            brep = Brep.from_step(f"IFC/data/exports/{guid}.step")
             brep.scale(0.001) # OCC auto converts to mm, we want m
             layer_group = create_hierarchy(scene, info["layer"], file_group)
             if brep.is_solid:
                 obj = scene.add(brep, name=info["name"], parent=layer_group)
     
         if info["type"] == "Mesh":
-            mesh = Mesh.from_obj(f"temp/ZHA/step_exports/{guid}.obj")
+            mesh = Mesh.from_obj(f"IFC/data/exports/{guid}.obj")
             layer_group = create_hierarchy(scene, info["layer"], file_group)
             scene.add(mesh, name=info["name"], parent=layer_group)
 
@@ -69,7 +69,7 @@ def add_file(scene, name):
             layer_group = create_hierarchy(scene, info["layer"], file_group)
             block_id = info["block_id"]
             if block_id not in loaded_blocks:
-                brep = Brep.from_step(f"temp/ZHA/step_exports/{block_id}.step")
+                brep = Brep.from_step(f"IFC/data/exports/{block_id}.step")
                 brep.scale(0.001) # OCC auto converts to mm, we want m
                 loaded_blocks[block_id] = brep
             else:
@@ -94,7 +94,7 @@ treeform = Treeform()
 viewer.ui.sidebar.widget.addWidget(treeform)
 
 def update_treeform(form, obj):
-    info = obj.attributes["info"]
+    info = obj.attributes.get("info", {})
     treeform.update_from_dict({"Info": info})
 
 viewer.ui.sidebar.sceneform.callback = update_treeform

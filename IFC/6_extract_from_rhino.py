@@ -15,7 +15,7 @@ def export_objects_to_step():
 
     # Create export directory in the same location as the script
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    export_dir = os.path.join(script_dir, "step_exports")
+    export_dir = os.path.join(script_dir, "data/exports")
     
     # Create the export directory if it doesn't exist
     if not os.path.exists(export_dir):
@@ -93,26 +93,6 @@ def export_objects_to_step():
                 exported_blocks[block_name] = block_id
 
 
-
-                #  # Get the inverse transformation matrix
-                # success, inverse_transform = transform.TryGetInverse()
-                # if not success:
-                #     raise Exception("Failed to get inverse transformation matrix")
-
-                # rs.UnselectAllObjects()
-
-                # block_obj = rs.TransformObject(obj, inverse_transform, copy=True)
-                # block_id = str(block_obj)
-
-                # rs.SelectObject(block_obj)
-                # filepath = os.path.join(export_dir, f"{block_id}.step")
-                # command = f'_-Export "{filepath}" _Enter'
-                # rs.Command(command)
-                # rs.DeleteObject(block_obj)
-
-                # exported_blocks[block_name] = block_id
-
-
             # Store instance reference information
             object_info[guid] = {
                 "layer": layer,
@@ -166,7 +146,7 @@ def export_objects_to_step():
    
     
     # Save the object information to a JSON file
-    json_path = os.path.join(script_dir, "blocks.json")
+    json_path = os.path.join(script_dir, "data/waffle.json")
     with open(json_path, 'w') as f:
         json.dump(object_info, f, indent=4)
     

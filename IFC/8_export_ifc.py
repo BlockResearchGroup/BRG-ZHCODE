@@ -11,11 +11,10 @@ from compas_ifc.model import Model
 
 
 
-def add_elements(model: Model, name):
+def add_elements(model: Model, name, parent, cls=None):
 
-    index = json.load(open(f"temp/ZHA/{name}.json"))
+    index = json.load(open(f"IFC/data/{name}.json"))
 
-    # file_group = scene.add_group(name=name)
     loaded_blocks = {}
 
     for guid, info in index.items():
@@ -24,21 +23,19 @@ def add_elements(model: Model, name):
         obj = None
 
         if info["type"] == "Brep":
-            brep = Brep.from_step(f"temp/ZHA/step_exports/{guid}.step")
+            brep = Brep.from_step(f"IFC/data/exports/{guid}.step")
             brep.scale(0.001) # OCC auto converts to mm, we want m
-            # layer_group = create_hierarchy(scene, info["layer"], file_group)
             if brep.is_solid:
-                obj = model.create(geometry=brep, name=info["name"], parent=model.building_storeys[0])
+                obj = model.create(cls=cls, geometry=brep, name=info["name"], parent=parent)
     
         if info["type"] == "Mesh":
-            mesh = Mesh.from_obj(f"temp/ZHA/step_exports/{guid}.obj")
-            # layer_group = create_hierarchy(scene, info["layer"], file_group)
-            model.create(geometry=mesh, name=info["name"], parent=model.building_storeys[0])
+            mesh = Mesh.from_obj(f"IFC/data/exports/{guid}.obj")
+            model.create(cls=cls, geometry=mesh, name=info["name"], parent=parent)
 
         if info["type"] == "InstanceReferenceGeometry":
             block_id = info["block_id"]
             if block_id not in loaded_blocks:
-                brep = Brep.from_step(f"temp/ZHA/step_exports/{block_id}.step")
+                brep = Brep.from_step(f"IFC/data/exports/{block_id}.step")
                 brep.scale(0.001) # OCC auto converts to mm, we want m
                 transformation = Transformation(info["transform"])
                 scale = transformation.scale # We apply the scale component of the transformation to the brep
@@ -48,22 +45,23 @@ def add_elements(model: Model, name):
                 brep = loaded_blocks[block_id]
 
             frame = Frame.from_matrix(info["transform"]) # We apply the rotation and translation components of the transformation to the frame
-            obj = model.create(geometry=brep, name=info["name"], parent=model.building_storeys[0], frame=frame)
+            obj = model.create(cls=cls, geometry=brep, name=info["name"], parent=parent, frame=frame)
         
         if obj:
             obj.attributes["info"] = info
 
 
-model = Model.template(unit="m", use_occ=True)
+model = Model.template(unit="m", use_occ=False)
 
 TOL.lineardeflection = 1000
 
+slab = model.create_slab(name="Bridge", parent=model.building_storeys[0])
 
-# add_elements(model, "blocks")
+add_elements(model, "blocks", slab, "IfcBuildingElementPart")
 # add_elements(model, "supports")
-add_elements(model, "waffle")
+# add_elements(model, "waffle")
 # add_elements(model, "foundations")
 
 # model.print_spatial_hierarchy()
-model.save("temp/ZHA/ifc_export_brep.ifc")
+model.save("IFC/data/striatus.ifc")
 # model.show()
