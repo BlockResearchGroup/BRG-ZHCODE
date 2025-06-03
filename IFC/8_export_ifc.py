@@ -74,16 +74,16 @@ mapping = {
         "anchor_bolts": "IfcMechanicalFastener",
 
          # Foundations
-        "concrete_pad": "IfcFooting",
+        "Concrete_pad": "IfcFooting",
         "grout": "IfcBuildingElementPart",
         "_UPDATE_concrete_pads": "IfcElementAssembly",
     }
 
 def get_cls(info):
 
-    layer = info["layer"]
+    layers = info["layer"].split("::")
     for layer_name, cls in mapping.items():
-        if layer.endswith(layer_name):
+        if layer_name in layers:
             return cls
 
     return "IfcBuildingElementProxy"
