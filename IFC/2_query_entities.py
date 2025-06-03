@@ -1,53 +1,35 @@
 from compas_ifc.model import Model
 
-model = Model("data/wall-with-opening-and-window.ifc")
-
-print("\n" + "*" * 53)
-print("Query Examples")
-print("*" * 53 + "\n")
-
-print("\nEntities by type")
-print("=" * 53 + "\n")
+model = Model("IFC/data/Duplex_A_20110907.ifc")
 
 
-print("Total number of entities: ", len(list(model.entities)))
-for i, entity in enumerate(model.entities):
+# Print the total number of entities in the model
+entities = list(model.entities)
+print("Total number of entities: ", len(entities))
+
+# Print the last 5 entities in the model
+for entity in entities[-5:]:
     print(entity)
-    if i > 5:
-        print("...\n")
-        break
 
-spatial_elements = model.get_entities_by_type("IfcSpatialElement")
-print("Total number of spatial elements: ", len(spatial_elements))
-for entity in spatial_elements:
+# Get entities by the IFC class name
+ifc_windows = model.get_entities_by_type("IfcWindow")
+print("\nTotal number of windows: ", len(ifc_windows))
+for entity in ifc_windows:
     print(entity)
-print()
 
-building_elements = model.get_entities_by_type("IfcBuildingElement")
-print("Total number of building elements: ", len(building_elements))
-for entity in building_elements:
-    print(entity)
-print()
-
-
-print("\nEntities by name")
-print("=" * 53 + "\n")
-
-name = "Window for Test Example"
+# Get entities by the element name
+name = "M_Fixed:4835mm x 2420mm:4835mm x 2420mm:145788"
 entities = model.get_entities_by_name(name)
-print("Found entities with the name: {}".format(name))
+print("\nFound entities with the name: {}".format(name))
 print(entities)
 
-
-print("\nEntities by id")
-print("=" * 53 + "\n")
-
-global_id = "3ZYW59sxj8lei475l7EhLU"
+# Get entity by the global id
+global_id = "1hOSvn6df7F8_7GcBWlR72"
 entity = model.get_entity_by_global_id(global_id)
-print("Found entity with the global id: {}".format(global_id))
-print(entity, "\n")
+print("\nFound entity with the global id: {}".format(global_id))
+print(entity)
 
-id = 1
-entity = model.get_entity_by_id(id)
-print("Found entity with the id: {}".format(id))
+# Get entity by the id (index in the IFC file)
+entity = model.get_entity_by_id(6426)
+print("\nFound entity with the id: {}".format(id))
 print(entity)

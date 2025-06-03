@@ -30,16 +30,16 @@ def add_elements(model: Model, name, parent, get_cls=None):
             model.create(cls=get_cls(info), geometry=mesh, name=info["name"], parent=parent)
 
         if info["type"] == "InstanceReferenceGeometry":
-            block_id = info["block_id"]
-            if block_id not in loaded_blocks:
-                brep = Brep.from_step(f"IFC/data/exports/{block_id}.step")
+            block_name = info["block_name"]
+            if block_name not in loaded_blocks:
+                brep = Brep.from_step(f"IFC/data/exports/{block_name}.step")
                 brep.scale(0.001) # OCC auto converts to mm, we want m
                 transformation = Transformation(info["transform"])
                 scale = transformation.scale # We apply the scale component of the transformation to the brep
                 brep.transform(scale)
-                loaded_blocks[block_id] = brep
+                loaded_blocks[block_name] = brep
             else:
-                brep = loaded_blocks[block_id]
+                brep = loaded_blocks[block_name]
 
             frame = Frame.from_matrix(info["transform"]) # We apply the rotation and translation components of the transformation to the frame
             obj = model.create(cls=get_cls(info), geometry=brep, name=info["name"], parent=parent, frame=frame)

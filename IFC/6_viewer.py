@@ -2,43 +2,41 @@ from compas_viewer import Viewer
 from compas_viewer.components import Treeform
 from compas_occ.brep import Brep
 from compas.datastructures import Mesh
-# from compas.colors import Color
 from compas.tolerance import TOL
 from compas.geometry import Transformation
 import json
 
-TOL.lineardeflection = 100
+TOL.lineardeflection = 1000
 
 hierarchy = {}
 
-def create_hierarchy(scene, layer, file_group = None):
+def create_hierarchy(scene, layer, file_group=None):
     # Split the layer path into individual layer names
     layers = layer.split("::")
-    
+
     # Start from the root of the hierarchy
     current_group = scene
     if file_group:
         current_path = file_group.name + "::"
     else:
         current_path = ""
-    
+
     # Traverse through each layer in the path
     for i, layer_name in enumerate(layers):
         # Build the current path
         current_path = f"{current_path}::{layer_name}" if current_path else layer_name
-        
+
         # Check if this path already exists in the hierarchy
         if current_path not in hierarchy:
             # For top layer, parent should be None
             parent = file_group if i == 0 else current_group
             # Create new group and store it in hierarchy
             hierarchy[current_path] = scene.add_group(name=layer_name, parent=parent)
-        
+
         # Move to the next level in the hierarchy
         current_group = hierarchy[current_path]
-    
-    return current_group
 
+    return current_group
 
 
 def add_file(scene, name):
@@ -55,11 +53,11 @@ def add_file(scene, name):
 
         if info["type"] == "Brep":
             brep = Brep.from_step(f"IFC/data/exports/{guid}.step")
-            brep.scale(0.001) # OCC auto converts to mm, we want m
+            brep.scale(0.001)  # OCC auto converts to mm, we want m
             layer_group = create_hierarchy(scene, info["layer"], file_group)
             if brep.is_solid:
                 obj = scene.add(brep, name=info["name"], parent=layer_group)
-    
+
         if info["type"] == "Mesh":
             mesh = Mesh.from_obj(f"IFC/data/exports/{guid}.obj")
             layer_group = create_hierarchy(scene, info["layer"], file_group)
@@ -67,18 +65,17 @@ def add_file(scene, name):
 
         if info["type"] == "InstanceReferenceGeometry":
             layer_group = create_hierarchy(scene, info["layer"], file_group)
-            block_id = info["block_id"]
-            if block_id not in loaded_blocks:
-                brep = Brep.from_step(f"IFC/data/exports/{block_id}.step")
-                brep.scale(0.001) # OCC auto converts to mm, we want m
-                loaded_blocks[block_id] = brep
+            block_name = info["block_name"]
+            if block_name not in loaded_blocks:
+                brep = Brep.from_step(f"IFC/data/exports/{block_name}.step")
+                brep.scale(0.001)  # OCC auto converts to mm, we want m
+                loaded_blocks[block_name] = brep
             else:
-                brep = loaded_blocks[block_id]
-            
+                brep = loaded_blocks[block_name]
 
             obj = scene.add(brep, name=info["name"], parent=layer_group)
             obj.transformation = Transformation(matrix=info["transform"])
-        
+
         if obj:
             obj.attributes["info"] = info
 
@@ -93,9 +90,11 @@ add_file(viewer.scene, "foundations")
 treeform = Treeform()
 viewer.ui.sidebar.widget.addWidget(treeform)
 
+
 def update_treeform(form, obj):
     info = obj.attributes.get("info", {})
     treeform.update_from_dict({"Info": info})
+
 
 viewer.ui.sidebar.sceneform.callback = update_treeform
 
