@@ -1,0 +1,16 @@
+name: brg-zha
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - pip
+  - compas >=2.13
+  - compas_occ
+  - pip:
+      - compas_cgal
+      - compas_gmsh
+      - compas_libigl
+      - compas_model
+      - compas_session
+      - compas_shapeop
+      - compas_viewer

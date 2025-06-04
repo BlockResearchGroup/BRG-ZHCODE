@@ -1,30 +1,101 @@
 # BRG-ZHCODE
+
 BRG workshop at ZHCODE
 
 ## Prerequisites
 
-### 1. Python Environment
+### CAD
+
+- Rhino 8
+
+### Python Environment
 
 - **Recommended:** [Miniforge](https://github.com/conda-forge/miniforge)
 - **Alternative:** If unfamiliar with Miniforge, install [Anaconda](https://www.anaconda.com/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
-### 2. Code Editor
+### Code Editor
 
-- [Visual Studio Code](https://code.visualstudio.com/) with the following extensions from Microsoft:
-  - Python
-  - Pylance
-  - C++ Extension Pack
+[Visual Studio Code](https://code.visualstudio.com/) with the following extensions from Microsoft:
 
-### 3. C++ Compiler Setup
+- Python
+- Pylance
+- C++ Extension Pack
 
-- **Windows:**  
-  - Install [Visual Studio](https://visualstudio.microsoft.com/)  
-  - During installation, select **"Desktop development with C++"** workload
+### C++ Compiler Setup
 
-- **macOS:**  
-  ```bash
-  xcode-select --install
+*This is only needed on Friday...*
 
-- **ubuntu:**  
-  ```bash
-  sudo apt-get install build-essential
+#### Windows
+
+- Install [Visual Studio](https://visualstudio.microsoft.com/)  
+- During installation, select **"Desktop development with C++"** workload
+
+#### macOS
+
+```bash
+xcode-select --install
+```
+
+#### Ubuntu
+
+```bash
+sudo apt-get install build-essential
+```
+
+## Installation
+
+We will repeat the installation process during the workshop.
+However, it is useful to already test that the installed tools work properly.
+
+If you are totally new to `conda`, please refer to the [getting started instructions](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html).
+
+On Windows, use the `Anaconda Prompt` instead of the standard `Commdand Prompt` or `Windows Powershell`.
+On Mac, you can just use the `Terminal`.
+
+## Create an environment
+
+Using `conda`, create an environment `zha-test`, and install `python3.12` and `compas_occ` from `conda-forge`.
+
+```bash
+conda create -n zha-test -c conda-forge python=3.12 compas_occ -y
+```
+
+## Activate the environment
+
+You can have many environments in parallel.
+Therefore, you need to activate the environment you want to use.
+
+```bash
+conda activate zha-test
+```
+
+## Install packages
+
+Except for `compas_occ`, the core packages of the COMPAS Framework can be installed directly from `PyPI`.
+
+```bash
+pip install compas==2.13 compas_cgal compas_libigl
+```
+
+## Test the installation
+
+Launch an interactive Python interpreter.
+
+```bash
+python
+```
+
+Import some or all of the installed packages and print their version.
+
+```bash
+>>> import compas
+>>> print(compas.__version__)
+'2.13.0'
+>>>
+```
+
+Exit the interpreter when you're done.
+
+```bash
+>>> exit()
+```
