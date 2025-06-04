@@ -54,10 +54,10 @@ On Mac, you can just use the `Terminal`.
 
 ## Create an environment
 
-Using `conda`, create an environment `zha-test`, and install `python3.12` and `compas_occ` from `conda-forge`.
+Using `conda`, create an environment `zha-intro`, and install `python3.12` and `compas_occ` from `conda-forge`.
 
 ```bash
-conda create -n zha-test -c conda-forge python=3.12 compas_occ -y
+conda create -n zha-intro -c conda-forge python=3.12 compas_occ -y
 ```
 
 ## Activate the environment
@@ -66,16 +66,27 @@ You can have many environments in parallel.
 Therefore, you need to activate the environment you want to use.
 
 ```bash
-conda activate zha-test
+conda activate zha-intro
 ```
 
 ## Install packages
 
-Except for `compas_occ`, the core packages of the COMPAS Framework can be installed directly from `PyPI`.
+Except for `compas_occ`, the core packages of the COMPAS Framework can be installed directly from `PyPI` using the `compas_framework` meta package.
 
 ```bash
-pip install compas==2.13 compas_cgal compas_libigl
+pip install "compas_framework>=0.1.3"
 ```
+
+This will install
+
+- `compas >= 2.13`
+- `compas_cgal`
+- `compas_gmsh`
+- `compas_libigl`
+- `compas_model`
+- `compas_session`
+- `compas_shapeop`
+- `compas_viewer`
 
 ## Test the installation
 

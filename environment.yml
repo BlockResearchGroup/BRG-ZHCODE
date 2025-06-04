@@ -6,11 +6,4 @@ dependencies:
   - pip
   - compas_occ
   - pip:
-      - compas >=2.13
-      - compas_cgal
-      - compas_gmsh
-      - compas_libigl
-      - compas_model
-      - compas_session
-      - compas_shapeop
-      - compas_viewer
+      - compas_framework>=0.1.3
