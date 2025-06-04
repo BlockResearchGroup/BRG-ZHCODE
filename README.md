@@ -49,7 +49,7 @@ However, it is useful to already test that the installed tools work properly.
 
 If you are totally new to `conda`, please refer to the [getting started instructions](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html).
 
-On Windows, use the `Anaconda Prompt` instead of the standard `Commdand Prompt` or `Windows Powershell`.
+On Windows, use the `Anaconda Prompt` instead of the standard `Commdand Prompt` or `Windows Powershell` to run `conda` commands.
 On Mac, you can just use the `Terminal`.
 
 ## Create an environment
@@ -85,6 +85,7 @@ Launch an interactive Python interpreter.
 python
 ```
 
+When the Python interpreter is active you will see the Python prompt (`>>>`).
 Import some or all of the installed packages and print their version.
 
 ```bash
