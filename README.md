@@ -11,7 +11,7 @@ BRG workshop at ZHCODE
 ### Python Environment
 
 - **Recommended:** [Miniforge](https://github.com/conda-forge/miniforge)
-- **Alternative:** If unfamiliar with Miniforge, install [Anaconda](https://www.anaconda.com/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+- **Alternative:** [Anaconda](https://www.anaconda.com/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
 ### Code Editor
 
