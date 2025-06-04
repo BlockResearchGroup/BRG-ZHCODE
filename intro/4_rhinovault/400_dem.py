@@ -11,12 +11,8 @@ from compas.geometry import trimesh_remesh
 from compas.itertools import pairwise
 from compas.scene import MeshObject
 from compas.scene import Scene
-from compas_libigl.mapping import map_mesh
+from compas_libigl.mapping import map_pattern_to_mesh
 from compas_viewer.viewer import Viewer
-from tessagon.adaptors.list_adaptor import ListAdaptor
-from tessagon.types.brick_tessagon import BrickTessagon
-from tessagon.types.octo_tessagon import OctoTessagon
-from tessagon.types.zig_zag_tessagon import ZigZagTessagon
 
 # =============================================================================
 # Session data
