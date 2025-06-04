@@ -1,12 +1,12 @@
-name: brg-zha
+name: zha-intro
 channels:
   - conda-forge
 dependencies:
   - python
   - pip
-  - compas >=2.13
   - compas_occ
   - pip:
+      - compas >=2.13
       - compas_cgal
       - compas_gmsh
       - compas_libigl
