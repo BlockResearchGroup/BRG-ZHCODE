@@ -6,7 +6,7 @@ import json
 from compas_ifc.model import Model
 
 
-mapping = {
+cls_mapping = {
 
     # Blocks
     "Blocks": "IfcBuildingElementPart",
@@ -29,17 +29,44 @@ mapping = {
 
 }
 
+pset_mapping = {
+    "Blocks": {
+        "Pset_ConcreteRecipe": json.load(open("IFC/data/recipe.json"))
+    }
+}
 
-def get_cls(info):
-    """Get the the IFC class for a given layer name, using the mapping dictionary."""
+granularity_mapping = {
+    # Blocks
+    "Blocks": ["full", "built"],
+
+    # Waffle
+    "waffle_addition": ["full", "temporary"],
+    "waffle_modules": ["full", "temporary"],
+
+    # Supports
+    "tension_ties": ["full", "built"],
+    "splice_plates": ["full", "built"],
+    "Plates": ["full", "built"],
+    "bolts": ["full", "built"],
+    "anchor_bolts": ["full", "built"],
+
+    # Foundations
+    "Concrete_pad": ["full", "built"],
+    "grout": ["full", "built"],
+    "_UPDATE_concrete_pads": ["full", "temporary"],
+}
+
+
+def get_from_mapping(info, mapping):
+    """Get the value from the mapping dictionary for a given element info"""
     layers = info["layer"].split("::")
-    for layer_name, cls in mapping.items():
+    for layer_name, value in mapping.items():
         if layer_name in layers:
-            return cls
+            return value
 
 
 
-def add_elements(model: Model, name, parent):
+def add_elements(model: Model, name, parent, granularity):
 
     metadata = json.load(open(f"IFC/data/{name}.json"))
 
@@ -49,15 +76,23 @@ def add_elements(model: Model, name, parent):
 
         print(guid, info)
 
+        cls = get_from_mapping(info, cls_mapping)
+        pset = get_from_mapping(info, pset_mapping)
+
+        # Skip if the element is not of the required granularity
+        element_granularity = get_from_mapping(info, granularity_mapping)
+        if element_granularity is None or granularity not in element_granularity:
+            continue
+
         if info["type"] == "Brep":
             brep = Brep.from_step(f"IFC/data/exports/{guid}.step")
             brep.scale(0.001) # OCC auto converts to mm, we want m
             if brep.is_solid:
-                model.create(cls=get_cls(info), geometry=brep, name=info["name"], parent=parent)
+                model.create(cls=cls, geometry=brep, name=info["name"], parent=parent, properties=pset)
     
         if info["type"] == "Mesh":
             mesh = Mesh.from_obj(f"IFC/data/exports/{guid}.obj")
-            model.create(cls=get_cls(info), geometry=mesh, name=info["name"], parent=parent)
+            model.create(cls=cls, geometry=mesh, name=info["name"], parent=parent, properties=pset)
 
         if info["type"] == "InstanceReferenceGeometry":
             block_name = info["block_name"]
@@ -78,11 +113,11 @@ def add_elements(model: Model, name, parent):
 
             # We then assign a frame for the IFC element (translation and rotation of the transformation)
             frame = Frame.from_matrix(info["transform"]) 
-            model.create(cls=get_cls(info), geometry=brep, name=info["name"], parent=parent, frame=frame)
+            model.create(cls=cls, geometry=brep, name=info["name"], parent=parent, frame=frame, properties=pset)
 
 # Create the template model
 model = Model.template(unit="m", use_occ=False)
-
+granularity = "temporary"
 
 # Create some parent elements
 slab = model.create(cls="IfcSlab", name="Bridge", parent=model.building_storeys[0])
@@ -90,13 +125,13 @@ scaffold = model.create(cls="IfcElementAssembly", name="Scaffold", parent=model.
 support = model.create(cls="IfcElementAssembly", name="Support", parent=model.building_storeys[0])
 
 # Add the elements to the model
-add_elements(model, "blocks", slab)
-add_elements(model, "supports", support)
-add_elements(model, "waffle", scaffold)
-add_elements(model, "foundations", model.building_storeys[0])
+add_elements(model, "blocks", slab, granularity)
+add_elements(model, "supports", support, granularity)
+add_elements(model, "waffle", scaffold, granularity)
+add_elements(model, "foundations", model.building_storeys[0], granularity)
 
 # Save the model
-model.save("IFC/data/striatus.ifc")
+model.save(f"IFC/data/striatus_{granularity}.ifc")
 
 # Reload and view the model
 # model = Model("IFC/data/striatus.ifc")
