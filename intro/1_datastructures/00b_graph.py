@@ -7,7 +7,6 @@ from compas.itertools import pairwise
 from compas_viewer.viewer import Viewer
 
 cloud = Pointcloud.from_bounds(10, 10, 0, 53)
-graph = Graph.from_pointcloud(cloud, degree=3)
 
 # =============================================================================
 # Viz
@@ -15,6 +14,6 @@ graph = Graph.from_pointcloud(cloud, degree=3)
 
 viewer = Viewer()
 
-viewer.scene.add(graph, show_points=True, pointsize=10)
+viewer.scene.add(cloud)
 
 viewer.show()

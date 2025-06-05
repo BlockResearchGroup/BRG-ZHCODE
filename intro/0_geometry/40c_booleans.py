@@ -1,10 +1,7 @@
 from compas.geometry import Box
 from compas.geometry import Cylinder
 from compas.geometry import Frame
-from compas.geometry import Polyhedron
 from compas.geometry import Sphere
-from compas.geometry import boolean_difference_mesh_mesh
-from compas.geometry import boolean_intersection_mesh_mesh
 from compas_viewer.viewer import Viewer
 
 R = 1.4
