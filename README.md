@@ -111,3 +111,7 @@ Exit the interpreter when you're done.
 ```bash
 >>> exit()
 ```
+
+## C++ / Python binding
+
+- [Step-by-step tutorial.](https://docs.google.com/presentation/d/1HL4o8cadvuZlQDsdYlslzeDhDVvTUlPdk9zTSn5fsLA/edit?slide=id.g35f9a478f0a_0_5#slide=id.g35f9a478f0a_0_5)
