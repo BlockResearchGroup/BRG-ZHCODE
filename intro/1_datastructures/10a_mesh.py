@@ -19,15 +19,17 @@ box.translate(vector)
 
 @print_profile
 def remesh(mesh):
-    average = (
-        sum(mesh.edge_length(edge) for edge in mesh.edges()) / mesh.number_of_edges()
-    )
+    average = sum(mesh.edge_length(edge) for edge in mesh.edges()) / mesh.number_of_edges()
     target = 3 * average
     V, F = mesh_remesh(mesh.to_vertices_and_faces(), target)
     return Mesh.from_vertices_and_faces(V, F)
 
 
 mesh = remesh(mesh)
+
+# =============================================================================
+# Viz
+# =============================================================================
 
 viewer = Viewer()
 viewer.scene.add(mesh)

@@ -1,6 +1,5 @@
 import compas
-from compas.geometry import Box
 
-box = Box(1)
+session = compas.json_load("session.json")
 
-compas.json_dump(box, "box.json")
+print(session)
