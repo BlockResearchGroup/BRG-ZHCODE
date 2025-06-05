@@ -1,16 +1,25 @@
+from compas.datastructures import Mesh
 from compas.geometry import Box
-from compas.geometry import Sphere
+from compas.geometry import Frame
+from compas.geometry import Polyhedron
 from compas_viewer.viewer import Viewer
 
-box = Box(1)
-sphere = Sphere(point=box.points[6], radius=0.5)
+a = Box(1)
+b = Box(1, frame=Frame(point=a.points[6]))
 
 # =============================================================================
 # Conversions
 # =============================================================================
 
-A = box.to_polyhedron(triangulated=True)
-B = sphere.to_polyhedron(triangulated=True)
+A = a.to_polyhedron(triangulated=True)
+
+mesh: Mesh = b.to_mesh()
+subd: Mesh = mesh.subdivided(k=3)
+subd.quads_to_triangles()
+
+V, F = subd.to_vertices_and_faces()
+
+B = Polyhedron(V, F)
 
 # =============================================================================
 # Booleans

@@ -11,6 +11,7 @@ from compas.geometry import trimesh_remesh
 from compas.itertools import pairwise
 from compas.scene import MeshObject
 from compas.scene import Scene
+from compas_dem.models import BlockModel
 from compas_libigl.mapping import map_pattern_to_mesh
 from compas_viewer.viewer import Viewer
 
@@ -19,7 +20,7 @@ from compas_viewer.viewer import Viewer
 # =============================================================================
 
 HERE = pathlib.Path(__file__).parent
-DATA = HERE.parent / "data"
+DATA = HERE.parent.parent / "data"
 SESSION = DATA / "RhinoVAULT.json"
 session = compas.json_load(SESSION)
 
@@ -56,26 +57,14 @@ trimesh = Mesh.from_vertices_and_faces(V, F)
 # Pattern mapping
 # =============================================================================
 
-options = {
-    "function": lambda u, v: [u, v, 0],
-    "u_range": [-0.25, 1.25],
-    "v_range": [-0.25, 1.25],
-    "u_num": 16,
-    "v_num": 16,
-    "u_cyclic": False,
-    "v_cyclic": False,
-    "adaptor_class": ListAdaptor,
-}
-
-tessagon = OctoTessagon(**options)
-tessagon_mesh = tessagon.create_mesh()
-pv = tessagon_mesh["vert_list"]
-pf = tessagon_mesh["face_list"]
-
-v, f = trimesh.to_vertices_and_faces()
-
-mv, mf = map_mesh((v, f), (pv, pf), clip_boundaries=True, tolerance=1e-6)
-pattern = Mesh.from_vertices_and_faces(mv, mf)
+pattern = map_pattern_to_mesh(
+    name="Brick",
+    mesh=trimesh,
+    tolerance=1e-3,
+    clip_boundaries=True,
+    pattern_u=24,
+    pattern_v=48,
+)
 
 # =============================================================================
 # Thickness
@@ -87,7 +76,7 @@ zvalues: list[float] = pattern.vertices_attribute(name="z")  # type: ignore
 zmin = min(zvalues)
 zmax = max(zvalues)
 
-tmin = 0.03
+tmin = 0.1
 tmax = 0.3
 
 for vertex in pattern.vertices():
@@ -141,6 +130,17 @@ for face in pattern.faces():
     blocks.append(block)
 
 # =============================================================================
+# Model
+# =============================================================================
+
+model = BlockModel()
+
+for mesh in blocks:
+    model.add_block_from_mesh(mesh)
+
+model.compute_contacts(tolerance=0.001)
+
+# =============================================================================
 # Viz
 # =============================================================================
 
@@ -149,7 +149,13 @@ viewer = Viewer()
 viewer.scene.add(trimesh, name="TriMesh")
 viewer.scene.add(pattern, name="Pattern", facecolor=Color.red())
 
+group = viewer.scene.add_group(name="Normals")
+
+
 group = viewer.scene.add_group(name="Blocks")
-group.add_from_list(blocks)  # type: ignore
+group.add_from_list(blocks, show_faces=True, opacity=0.5)  # type: ignore
+
+group = viewer.scene.add_group(name="Contacts")
+group.add_from_list([contact.polygon for contact in model.contacts()], color=Color.cyan())  # type: ignore
 
 viewer.show()

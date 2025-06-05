@@ -19,21 +19,25 @@ cx = Cylinder(0.7 * R, 4 * R, frame=YZ)
 cy = Cylinder(0.7 * R, 4 * R, frame=ZX)
 cz = Cylinder(0.7 * R, 4 * R, frame=XY)
 
-A = boolean_intersection_mesh_mesh(
-    box.to_vertices_and_faces(triangulated=True),
-    sphere.to_vertices_and_faces(triangulated=True),
-)
+# =============================================================================
+# Booleans
+# =============================================================================
 
-for B in (cx, cy):
-    A = boolean_difference_mesh_mesh(A, B.to_vertices_and_faces(triangulated=True))
+A = box.to_polyhedron(triangulated=True, u=64)
+B = sphere.to_polyhedron(triangulated=True, u=64, v=64)
 
-result = Polyhedron(*A)  # type: ignore
+Cx = cx.to_polyhedron(triangulated=True, u=64)
+Cy = cy.to_polyhedron(triangulated=True, u=64)
+Cz = cz.to_polyhedron(triangulated=True, u=64)
+
+result = A & B
+result = result - Cx
+result = result - Cy
+# result = result - Cz
 
 # =============================================================================
 # Viz
 # =============================================================================
-
-# TOL.lineardeflection = 0.1
 
 viewer = Viewer()
 viewer.scene.add(result)

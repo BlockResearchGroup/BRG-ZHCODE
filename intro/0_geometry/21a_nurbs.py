@@ -37,7 +37,7 @@ viewer.scene.add(Polyline(points), show_points=True, name="ControlPoly")
 boxobj = viewer.scene.add(box)
 
 
-@viewer.on(200, frames=53)
+@viewer.on(100, frames=53)
 def update(frame):
     boxobj.transformation = transformations[frame]
     boxobj.update()
