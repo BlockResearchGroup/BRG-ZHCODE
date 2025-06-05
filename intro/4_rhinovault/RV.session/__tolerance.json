@@ -1,0 +1,1 @@
+{"dtype": "compas.tolerance/Tolerance", "data": {"unit": "M", "absolute": 1e-09, "relative": 1e-06, "angular": 1e-06, "approximation": 0.001, "precision": 3, "lineardeflection": 0.001, "angulardeflection": 0.1}, "guid": "ca0c68c3-8e15-4c74-9030-f56ef7875a8a"}
